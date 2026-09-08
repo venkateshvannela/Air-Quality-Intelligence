@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Air Quality Intelligence</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div>
+            <h1>Air Quality Intelligence</h1>
+
+            <p>
+                Smart air-quality monitoring and analysis
+            </p>
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+        <section class="search-section">
+
+            <input
+                id="cityInput"
+                type="text"
+                placeholder="Enter city name..."
+                value="Nandyal"
+            >
+
+            <button
+                id="searchButton"
+                onclick="searchAirQuality()"
+            >
+                Check Air Quality
+            </button>
+
+        </section>
+
+
+        <div id="loading" class="loading hidden">
+            Getting air-quality data...
+        </div>
+
+
+        <div id="error" class="error hidden"></div>
+
+
+        <section
+            id="dashboard"
+            class="dashboard hidden"
+        >
+
+            <div class="location-card">
+
+                <h2 id="cityName">-</h2>
+
+                <p id="locationDetails">-</p>
+
+            </div>
+
+
+            <section class="aqi-card">
+
+                <p class="label">
+                    AIR QUALITY INDEX
+                </p>
+
+                <div
+                    id="aqiValue"
+                    class="aqi-value"
+                >
+                    --
+                </div>
+
+                <div
+                    id="aqiCategory"
+                    class="aqi-category"
+                >
+                    --
+                </div>
+
+            </section>
+
+
+            <section class="cards">
+
+                <div class="card">
+
+                    <h3>PM2.5</h3>
+
+                    <p id="pm25">
+                        --
+                    </p>
+
+                    <span>
+                        AQI contribution
+                    </span>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>PM10</h3>
+
+                    <p id="pm10">
+                        --
+                    </p>
+
+                    <span>
+                        AQI contribution
+                    </span>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>Ozone</h3>
+
+                    <p id="ozone">
+                        --
+                    </p>
+
+                    <span>
+                        AQI contribution
+                    </span>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>NO₂</h3>
+
+                    <p id="no2">
+                        --
+                    </p>
+
+                    <span>
+                        AQI contribution
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <section class="information-grid">
+
+                <div class="info-card">
+
+                    <h3>
+                        Dominant Pollutant
+                    </h3>
+
+                    <p id="dominantPollutant">
+                        --
+                    </p>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <h3>
+                        Data Source
+                    </h3>
+
+                    <p id="dataSource">
+                        --
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="recommendation">
+
+                <h3>
+                    Health Recommendation
+                </h3>
+
+                <p id="recommendation">
+                    --
+                </p>
+
+            </section>
+
+
+            <section class="details">
+
+                <h3>
+                    Current Measurements
+                </h3>
+
+                <div id="currentData"></div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            Air Quality Intelligence
+        </p>
+
+        <p>
+            WAQI / Ozon3 + Open-Meteo
+        </p>
+
+    </footer>
+
+
+    <script src="/static/app.js"></script>
+
+</body>
+
+</html>
