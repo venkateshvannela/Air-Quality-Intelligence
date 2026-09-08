@@ -1,149 +1,593 @@
+# 🌍 Air Quality Intelligence
 
+An intelligent air-quality analysis system that combines **WAQI/Ozon3 monitoring-station data** with **Open-Meteo model-based air-quality data** to provide AQI classification, dominant-pollutant analysis, and health recommendations.
 
-<div align=center
+The system automatically uses WAQI when monitoring-station data is available and falls back to Open-Meteo when a location does not have WAQI coverage.
 
-</br>
+---
 
-# Ozon3
+## 🚀 Features
 
-![SVG of ozon3 logo](/src/media/ozon3_logo.svg)
+* 🌍 Search air quality by city/place name
+* 📡 Retrieve air-quality data from WAQI
+* 🔄 Automatic Open-Meteo fallback when WAQI has no station coverage
+* 📊 US AQI classification
+* 🧪 Pollutant-level AQI analysis
+* 🔎 Dominant pollutant detection
+* 🫁 Health recommendations based on AQI
+* 📍 Location detection using latitude and longitude
+* ⏱️ Current air-quality information
+* 📈 Hourly air-quality forecast data
+* 🐳 Docker support
+* 🔐 Environment-variable based API-token configuration
+* 🐍 Python 3.12 compatibility for the tested current-data workflow
 
-[![PyPI version](https://badge.fury.io/py/ozon3.svg)](https://badge.fury.io/py/ozon3) <a href="CONTRIBUTING.md#pull-requests"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a> ![GitHub](https://img.shields.io/github/license/Ozon3Org/Ozon3) [![Complete Documentation](https://github.com/Ozon3Org/Ozon3/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Ozon3Org/Ozon3/actions/workflows/pages/pages-build-deployment) [![Dependency Review](https://github.com/Ozon3Org/Ozon3/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Ozon3Org/Ozon3/actions/workflows/dependency-review.yml) [![Tests](https://github.com/Ozon3Org/Ozon3/actions/workflows/test.yml/badge.svg)](https://github.com/Ozon3Org/Ozon3/actions/workflows/test.yml) [![codecov](https://codecov.io/github/Ozon3Org/Ozon3/branch/main/graph/badge.svg?token=N2HMGQYCHI)](https://codecov.io/github/Ozon3Org/Ozon3)
-[![Buy Me a Coffee](https://img.shields.io/badge/buy_me_a_coffee-orange.svg?style=flat)](https://www.buymeacoffee.com/MilindSharma)
+---
 
-## The simplest AQI API
+## 🧠 How It Works
 
-</div>
+The system follows a two-source architecture:
 
-Getting air quality data with Python should be easy and straightforward - and that's exactly what Ozon3 can help you with.
-With Ozon3, just 4 lines of code are enough to get you the data you need. And the best part is that you can trust this data to be accurate and reliable, since the package uses the World Air Quality Index's API under the hood! ✅ 📈
-
-Use Ozon3 to **get real-time air quality data, or historical data from 2014 onwards**, and fetch air quality data **for anywhere in the world** in seconds.
-
-
-
-_You can view our complete documentation [here](https://Ozon3Org.github.io/Ozon3/)_
-
-_Don't forget to star Ozon3 repository if you found it helpful_
-
-#### Table of Contents
-
-[Install ozon3](#install-it-here)
-
-[Getting your API token](#getting-your-api-token)
-
-[Getting started](#getting-started)
-
-[Contributing and submitting PR's](#contributing-and-submitting-pull-requests)
-
-[Semantic Versioning System](#semantic-versioning-system)
-
-[Attributions](#world-air-quality-index-and-epa-attribution)
-
-[License and TOS](#license-and-terms-of-service)
-
-[Contributors](#contributors)
-
-## Install it here!
-
-```sh
-pip install ozon3
+```text
+                 User
+                   │
+                   ▼
+          Air Quality Service
+                   │
+                   ▼
+          ┌─────────────────┐
+          │   Try WAQI      │
+          │   / Ozon3       │
+          └────────┬────────┘
+                   │
+          Station available?
+              ┌────┴────┐
+             YES        NO
+              │          │
+              ▼          ▼
+        WAQI Station   Open-Meteo
+           Data        Coordinate Data
+              │          │
+              └────┬─────┘
+                   ▼
+          Air Quality Analyzer
+                   │
+          ┌────────┼─────────┐
+          ▼        ▼         ▼
+         AQI   Pollutant   Category
+               Analysis
+                   │
+                   ▼
+          Health Recommendation
 ```
 
-You can find more information on the PyPI page for Ozon3 [here](https://pypi.org/project/ozon3/)
+### Source selection
 
-## Getting your API token
+**WAQI / Ozon3**
 
-To use Ozon3, you must first request and get a your own unique API token 🎫. This is required to access for the underlying API to work 👮🏼‍♂️.
+Used first when the requested location has an available monitoring station.
 
-This is very easy to do, and takes no time at all as your token is generally emailed to you instantly.
+**Open-Meteo**
 
-Get your token [here](https://aqicn.org/data-platform/token/#/)!
+Used as a fallback when WAQI does not provide station coverage for the requested location.
 
-## Getting started
+> Open-Meteo air-quality values are model-based and should not be described as measurements from a physical monitoring station.
 
-### Real-time data
+---
+
+## 📊 AQI Classification
+
+The analyzer classifies US AQI values into the following categories:
+
+|     AQI | Category                       |
+| ------: | ------------------------------ |
+|    0–50 | Good                           |
+|  51–100 | Moderate                       |
+| 101–150 | Unhealthy for Sensitive Groups |
+| 151–200 | Unhealthy                      |
+| 201–300 | Very Unhealthy                 |
+|    301+ | Hazardous                      |
+
+The system also generates a health recommendation based on the resulting category.
+
+---
+
+## 🧪 Pollutant Analysis
+
+The system considers pollutant-specific AQI values including:
+
+* PM2.5
+* PM10
+* Nitrogen Dioxide (NO₂)
+* Ozone (O₃)
+* Sulphur Dioxide (SO₂)
+* Carbon Monoxide (CO)
+
+The pollutant with the highest available pollutant-specific AQI is identified as the **dominant pollutant**.
+
+---
+
+## 📁 Project Structure
+
+```text
+Air-Quality-Intelligence/
+│
+├── .github/
+│
+├── src/
+│   ├── ozon3/
+│   │   ├── historical/
+│   │   ├── __init__.py
+│   │   ├── ozon3.py
+│   │   └── urls.py
+│   │
+│   ├── media/
+│   │
+│   └── air_quality_intelligence/
+│       ├── __init__.py
+│       ├── analyzer.py
+│       ├── open_meteo.py
+│       └── service.py
+│
+├── tests/
+│
+├── Dockerfile
+├── .dockerignore
+├── requirements.txt
+├── requirements-docker.txt
+├── pyproject.toml
+├── setup.py
+├── setup.cfg
+├── LICENSE
+├── README.md
+└── FILE_STRUCTURE.md
+```
+
+---
+
+# ⚙️ Installation
+
+## 1. Clone the repository
+
+```bash
+git clone https://github.com/venkateshvannela/Air-Quality-Intelligence.git
+cd Air-Quality-Intelligence
+```
+
+---
+
+## 2. Create a Python 3.12 virtual environment
+
+Python 3.12 is recommended for the currently tested workflow.
+
+### Windows
+
+```powershell
+py -3.12 -m venv .venv
+```
+
+Activate it:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+You should see:
+
+```text
+(.venv)
+```
+
+in your terminal.
+
+---
+
+## 3. Install dependencies
+
+For the current air-quality intelligence workflow:
+
+```powershell
+pip install pandas numpy requests ratelimit python-decouple openpyxl js2py sseclient-py
+```
+
+The repository also contains the original dependency configuration in `requirements.txt`.
+
+---
+
+# 🔐 WAQI API Configuration
+
+WAQI requires an API token for its API.
+
+Create a file named:
+
+```text
+.env
+```
+
+in the project root.
+
+Add:
+
+```env
+WAQI_TOKEN=YOUR_WAQI_API_TOKEN
+```
+
+Replace `YOUR_WAQI_API_TOKEN` with your actual token.
+
+### ⚠️ Security
+
+Never commit your `.env` file or expose your API token publicly.
+
+The repository's `.gitignore` already excludes:
+
+```text
+.env
+```
+
+---
+
+# ▶️ Running the Project
+
+Because this repository uses a `src` directory, set the Python path before running the project.
+
+### PowerShell
+
+```powershell
+$env:PYTHONPATH="$PWD\src"
+```
+
+Then run Python.
+
+Example:
+
+```powershell
+python
+```
+
+---
+
+## 🧪 Example Usage
+
 ```python
-import ozon3 as ooo
+from air_quality_intelligence.service import AirQualityService
 
-o3 = ooo.Ozon3('YOUR_PRIVATE_TOKEN')
-data = o3.get_city_air('New Delhi')
+service = AirQualityService()
+
+result = service.get_city_analysis("Nandyal")
+
+print("Status:", result["status"])
+print("City:", result["requested_city"])
+print("AQI:", result["aqi"])
+print("Category:", result["category"])
+print("Dominant pollutant:", result["dominant_pollutant"])
+print("Source:", result["source"])
+print("Recommendation:", result["recommendation"])
 ```
 
-for many cities:
+---
 
-```python
-data = o3.get_multiple_city_air(['London', 'Hong Kong', 'New York'])     # As many locations as you need
+# 📍 Example: Nandyal
+
+For locations without an available WAQI monitoring station, the system automatically uses Open-Meteo.
+
+Example:
+
+```text
+City: Nandyal
+AQI: 54
+Category: Moderate
+Dominant pollutant: pm2.5
+Source: Open-Meteo
 ```
 
-### Historical data
+The response also contains current pollutant values and hourly forecast information.
 
-```python
-data = o3.get_historical_data(city='Houston')     # data from 2014 onwards!
+The Open-Meteo result represents **model-based air quality at the requested coordinates**, not a physical monitoring station in Nandyal.
+
+---
+
+# 🏙️ Example: Hyderabad
+
+For locations where WAQI station data is available, the system can use WAQI/Ozon3.
+
+Example:
+
+```text
+City: Hyderabad
+AQI: 93
+Category: Moderate
+Dominant pollutant: pm2.5
+Source: WAQI / Ozon3
+Source type: Monitoring station data
+Fallback: False
 ```
 
-<hr>
+This demonstrates the project's dual-source architecture.
 
-### Examples In Action 🎬
-![Gif of Ozon3.get_city_air()](/src/media/example_get_city_air.gif)
+---
 
-![Gif of Ozon3.get_multiple_city_air()](/src/media/example_get_multiple_city_air.gif)
+# 🔄 Fallback Architecture
 
-![Gif of Ozon3.get_historical_data()](/src/media/example_get_historical_data.gif)
-### Air Quality Parameters
+The main service uses the following logic:
 
-Ozon3 can fetch the following parameters:
+```text
+Request city
+     │
+     ▼
+Try WAQI / Ozon3
+     │
+     ├── Data available ──────► Analyze WAQI data
+     │
+     └── No station/data
+                │
+                ▼
+          Try Open-Meteo
+                │
+                ├── Data available ──► Analyze model data
+                │
+                └── No data
+                         │
+                         ▼
+                    Return no data
+```
 
- * `aqi`: air quality index, a measurement of air quality that tells you how clean or polluted the air is. It is measured in micrograms per cubic meter (µg/m3).
- * `pm25`: fine particulate matter, a measure of 2.5 micrometers or smaller particles in the air. It is measured in micrograms per cubic meter (µg/m3).
- * `pm10`: respirable particulate matter, a measure of 10 micrometers or smaller particles in the air. It is measured in micrograms per cubic meter (µg/m3).
- * `o3`: a measure of ground level ozon3 concentrations in the air. It is measured in parts per billion (ppb).
- * `co`: a measure of carbon monoxide concentrations in the air. It is measured in parts per billion (ppb).
- * `no2`: a measure of nitrogen dioxide concentrations in the air. It is measured in parts per billion (ppb).
- * `so2`: a measure of sulfur dioxide concentrations in the air. It is measured in parts per billion (ppb).
- * `dew`: dew point, the temperature the air needs to be cooled to in order to reach 100% relative humidity. It is measured in Celsius (°C) or Fahrenheit (°F).
- * `h`: relative humidity, a measure of moisture in the atmosphere. It does not have a standard unit of measurement.
- * `p`: atmospheric pressure, a measure of the weight of atoms and molecules that make up the layers in the atmosphere. It is measured in Pascal (Pa).
- * `t`: temperature, a measure of thermal energy in one or a combined substance at a given time. It is measured in Celsius (°C) or Fahrenheit (°F).
- * `w`: wind speed, a measure of air in motion. It is measured in kilometers per hour (km/h)
+This makes the system more useful than depending on a single air-quality data provider.
 
-Sample output:
-<img width="1065" alt="blehblhe" src="./src/media/sample-output.png">
+---
 
-## Contributing and submitting Pull requests
+# 🐳 Docker
 
-**We love PR's!**
+The project includes Docker support for running the air-quality intelligence workflow in a container.
 
-Take a look at the [CONTRIBUTING.md](https://github.com/Ozon3Org/Ozon3/blob/main/CONTRIBUTING.md) file for details on how to go about this!
+## Build the Docker image
 
-## Semantic Versioning System
+From the project root:
 
-Ozon3 uses a semantic versioning system to increment its release version number. Using this model, changes in version numbers can help indicate the meaning of modified code for each version.
+```powershell
+docker build -t air-quality-intelligence .
+```
 
-See more information on semantic versioning [here](https://github.com/Ozon3Org/Ozon3/discussions/26).
+---
 
-## World Air Quality Index and EPA attribution
+## Run the container
 
-This package is a wrapper around an API provided by the World Air Quality Index project. Without them as well as the US EPA, Ozon3 would not exist. Please consider visiting the WAQI website and contributing to their project if you have time:
+Make sure your `.env` file contains your WAQI token.
 
-[World Air Quality Index](https://aqicn.org/contact/)
+Then:
 
-[United States Environmental Protection Agency](https://www.epa.gov/aboutepa)
+```powershell
+docker run --rm --env-file .env air-quality-intelligence
+```
 
-## LICENSE and Terms of Services 📰
+The container runs the air-quality analysis for Nandyal.
 
-1. Ozon3 is licensed under the GNU GENERAL PUBLIC LICENSE v3.0, and so it cannot be used for closed-source software or for monetary gain.
-2. The WAQI API, which Ozon3 uses to provide data, has it's own [Acceptable Usage Policy](https://aqicn.org/api/tos/). Please refer to it for more details.
+Example output:
 
-## Contributors
+```text
+status: success
+place: Nandyal
+source: Open-Meteo
+aqi_standard: US AQI
+aqi: 54
+category: Moderate
+dominant_pollutant: pm2.5
+fallback: True
+```
 
-Contributions of any kind are welcome! These are our amazing contributors :)
+---
 
-<a href="https://github.com/Ozon3Org/Ozon3/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Ozon3Org/Ozon3" />
-</a>
+# 🐳 Docker Architecture
 
-Enjoy using Ozon3!
-🥳 🍾 🚀
+```text
+                 Docker Container
+                       │
+                       ▼
+          Air Quality Intelligence
+                       │
+             ┌─────────┴─────────┐
+             ▼                   ▼
+          WAQI/Ozon3         Open-Meteo
+             │                   │
+             └─────────┬─────────┘
+                       ▼
+                AQI Analyzer
+                       │
+                       ▼
+              Intelligence Report
+```
 
-#### _Created by [Milind Sharma](https://github.com/Milind220)_
+The API token is supplied at runtime through the `.env` file and is not copied into the Docker image.
+
+---
+
+# 🧩 Main Components
+
+## `analyzer.py`
+
+Contains the intelligence layer.
+
+Responsibilities:
+
+* AQI classification
+* Health recommendations
+* Air-quality report generation
+* Dominant pollutant information
+
+---
+
+## `open_meteo.py`
+
+Provides Open-Meteo integration.
+
+Responsibilities:
+
+* Location search
+* Coordinate retrieval
+* Current air-quality data
+* Hourly air-quality data
+* Pollutant-specific AQI values
+* Model-based air-quality analysis
+
+---
+
+## `service.py`
+
+Acts as the main service layer.
+
+Responsibilities:
+
+1. Try WAQI/Ozon3.
+2. Analyze available station data.
+3. Fall back to Open-Meteo if WAQI has no coverage.
+4. Return a unified air-quality intelligence result.
+
+---
+
+## `ozon3/`
+
+This is the original Ozon3 package integrated into the project.
+
+Ozon3 provides functionality for retrieving air-quality information through the World Air Quality Index API.
+
+The original project and its licensing/attribution requirements are retained.
+
+---
+
+# 🛠️ Technologies Used
+
+| Technology      | Purpose                             |
+| --------------- | ----------------------------------- |
+| Python          | Core programming language           |
+| Pandas          | Data processing                     |
+| NumPy           | Numerical operations                |
+| Requests        | API communication                   |
+| Python-Decouple | Environment configuration           |
+| Ozon3           | WAQI API integration                |
+| WAQI            | Monitoring-station air-quality data |
+| Open-Meteo      | Model-based air-quality fallback    |
+| Docker          | Containerization                    |
+| Git             | Version control                     |
+| GitHub          | Source-code hosting                 |
+
+---
+
+# 🌐 Data Sources
+
+## World Air Quality Index
+
+WAQI provides access to air-quality information from monitoring stations around the world.
+
+Official API documentation:
+
+https://aqicn.org/api/
+
+---
+
+## Open-Meteo
+
+Open-Meteo provides coordinate-based weather and air-quality data, including pollutant concentrations and AQI values.
+
+Official documentation:
+
+https://open-meteo.com/en/docs/air-quality-api
+
+---
+
+# 🔬 Project Improvements
+
+This project extends the original Ozon3 functionality with an additional intelligence layer.
+
+### Added functionality
+
+* Air Quality Analyzer
+* AQI classification
+* Health recommendations
+* Pollutant analysis
+* Dominant pollutant detection
+* Open-Meteo integration
+* Automatic data-source fallback
+* Unified service layer
+* Docker containerization
+* Python 3.12 compatibility improvements for the tested current-data workflow
+
+The goal is to transform raw air-quality API data into information that is easier for users to understand and act upon.
+
+---
+
+# 📌 Important Data Interpretation
+
+Different data sources represent different types of information.
+
+### WAQI / Ozon3
+
+```text
+Monitoring station
+       ↓
+Observed air-quality data
+       ↓
+Station AQI
+```
+
+### Open-Meteo
+
+```text
+User location
+       ↓
+Coordinate / model grid
+       ↓
+Model-based air-quality data
+       ↓
+Estimated AQI
+```
+
+Therefore, Open-Meteo fallback results should not be presented as measurements from a physical monitoring station.
+
+---
+
+# 🔮 Future Enhancements
+
+Possible future versions can include:
+
+* 📱 Mobile-friendly dashboard
+* 📊 Interactive AQI charts
+* 🗺️ Air-quality map
+* 🔔 AQI alerts and notifications
+* 🤖 Machine-learning based AQI forecasting
+* 📈 Historical trend analysis
+* 🧠 Personalized health recommendations
+* 🌦️ Weather + air-quality correlation
+* 🏙️ Multi-city comparison
+* 🗄️ Database storage
+* 🔐 User accounts
+* ☁️ Cloud deployment
+* 📡 Real-time monitoring dashboard
+
+---
+
+# 📜 License and Attribution
+
+This repository contains and extends code from the original **Ozon3** open-source project.
+
+Original project:
+
+https://github.com/Ozon3Org/Ozon3
+
+Original author:
+
+**Milind Sharma**
+
+The original Ozon3 project is released under the **GNU General Public License v3.0 (GPL-3.0)**.
+
+The original license and attribution requirements remain applicable to the Ozon3-derived portions of this repository.
+
+Please refer to the included `LICENSE` file for the complete license text.
+
+---
+
+# 👨‍💻 Project
+
+**Air Quality Intelligence**
+
+An enhanced air-quality analysis project combining monitoring-station data, model-based air-quality data, automated fallback, pollutant analysis, and intelligent AQI interpretation.
+
+Built using Python, WAQI/Ozon3, Open-Meteo, and Docker.

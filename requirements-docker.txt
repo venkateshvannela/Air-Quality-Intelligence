@@ -1,0 +1,6 @@
+pandas>=2.2
+numpy>=1.26
+requests>=2.31
+ratelimit==2.2.1
+python-decouple>=3.8
+openpyxl>=3.1
