@@ -21,7 +21,7 @@ import pandas
 import requests
 from ratelimit import limits, sleep_and_retry
 
-from .historical._reverse_engineered import get_data_from_id
+
 from .urls import URLs
 
 # 1000 calls per second is the limit allowed by API
@@ -584,6 +584,8 @@ class Ozon3:
                     "Both arguments city and city_id were supplied. "
                     "Only city_id will be used. city argument will be ignored."
                 )
+
+        from .historical._reverse_engineered import get_data_from_id
 
         df = get_data_from_id(city_id)
         if "pm25" in df.columns:
